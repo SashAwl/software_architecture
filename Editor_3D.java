@@ -19,7 +19,7 @@ public enum OtherTypeModel {
     IFC
 }
 
-/*
+/* 
  * Model - сущность 3D-модели с некоторыми атрибутами
  */
 public class Model {
@@ -42,7 +42,7 @@ public class Rendering {
 }
 /*
  * Editor - редактор, позволяющий вносить изменения в переданную(только созданную или загруженную) модель 
- * *посредством применения метода editModel(Model model)
+ * * посредством применения метода editModel(Model model)
  */
 public class Editor {
     public Model editModel(Model model) {
@@ -50,14 +50,19 @@ public class Editor {
     }
 }
 
-/* iRepo - интерфейс, позволяющий предотвратить зависимость более абстрактного класса BusinessLogic 
-**от менее абстрактного класса Repository 
+/* 
+* iRepo - интерфейс, позволяющий предотвратить зависимость более абстрактного класса BusinessLogic 
+** от менее абстрактного класса Repository 
 */
 public interface iRepo {
-    public Model getModel();
+    public void saveChanges();
 }
 
-
+/* 
+ * Repository - класс, содержащий методы для работы с источниками данных; реализует интерфейс iRepo
+ * getModel() - возвращает модель из источника данных
+ * saveChanges() - сохраняет произведенные изменения 
+ */
 public class Repository implements iRepo{
     public Model getModel(){
         return new Model();
@@ -68,11 +73,16 @@ public class Repository implements iRepo{
     }
 }
 
-public interface iView {
-    public void selectNewModel();
-}
-
-public class View  implements iView {
+/*
+ * View - класс, содержащий методы для работы с визульной частью редактора
+ * класс Editor является компонентом данного класса
+ * uploadModel() - обращается к методу getModel() класса Repository, загружая тем самым модель из источника данных, и 
+ * * с помощью метода showModel(Model model) отображает ее на экране 
+ * considerModel(Model model) - позволяет рассматривать модель, вращая, увеличивая или уменьшая ее
+ * selectNewModel()  - позволяет посредством меню выбрать тип создаваемой модели и 
+ ** вызывает метод createModel() класса BusinessLogic для непосредственного создания модели
+ */ 
+public class View {
 
     public Model editModel(Model model) {
 
@@ -82,8 +92,7 @@ public class View  implements iView {
 
     public void uploadModel(){
 
-        iRepo irepo = new Repository();
-        Model someModel = irepo.getModel();
+        Model someModel = new Repository().getModel();
         new View().showModel(someModel);
     }
 
@@ -95,17 +104,18 @@ public class View  implements iView {
         System.out.println("Zoom in and out of the model to see");
     }
 
-    public void selectNewModel(){
-        System.out.println("Select of type the model to create");
+    public Model selectNewModel(){
+        return new BusinessLogic.createModel();
     }
 }
 
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello world!");
-    }
-}
-
+/*
+ * BusinessLogic - класс, содержащий методы, относящиеся к логике работы редактора
+ * convertationModel(OtherTypeModel otherModel) - метод, конвертирующий переданную модель в нужный нам формат 
+ ** посредством применения метода changeFormat() и сохраниения изменений в память с помощью метода saveChanges()
+ * createModel() - возвращает новую модель
+ * renderModel(Model model) - возвращает рендеринг переданной модели
+ */
 public class BusinessLogic{
     public Model convertationModel(OtherTypeModel otherModel){
         new BusinessLogic().changeFormat(otherModel);
@@ -118,12 +128,16 @@ public class BusinessLogic{
     }
 
     public Model createModel(){
-        iView iview = new View();
-        iview.selectNewModel();
         return new Model();
     }
 
     public Rendering renderModel(Model model) {
         return new Rendering();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello world!");
     }
 }
