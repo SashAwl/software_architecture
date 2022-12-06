@@ -34,11 +34,11 @@ class JSON{
 }
 
 /**
- * Sender - класс, содержащий методы для отправки данных в приложение
+ * Sender - класс, содержащий методы для отправки данных в приложение; реализует интерфейс iSend
  * convertJSON(ReportObject someReport) - конвертирует отчет из исходного формата в формат JSON
  * send(JSON reportJSON) - осуществляет непосредственно отправку подготовленного отчета
  */
-class Sender{
+class Sender implements iSend{
     public JSON convertJSON(ReportObject someReport){
         return new JSON();
     }
@@ -53,6 +53,7 @@ class Sender{
  * * от менее абстрактного класса Sender 
  */
 interface iSend{
+    public JSON convertJSON(ReportObject someReport);
     public void send(JSON reportJSON);
 }
 
